@@ -1,0 +1,13 @@
+* playlist
+🎵 A minimalist playlist for the browser for playing static content from an nginx static site
+
+** Use case
+We have a nginx server running on our local network statically serving a folder with many songs and videos. To play those videos automatically, we put the playlist link into the playlist page.
+
+** Installation
+Simply clone this repository into your static content directory and navigate to it within your browser.
+
+** How it works
+The playlist JavaScript downloads the nginx generated index page for the URL you enter, filters for compatible formats, and queues that content to play. Make sure you give it the full path, with the leading ~/~.
+
+[[https://i.imgur.com/3oQkFq6.png]]
