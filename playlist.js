@@ -24,7 +24,10 @@ function hide (id) {
 
 function onKey (key, f) {
   return function (e) {
-    if (e.keyCode == key) {
+    // https://stackoverflow.com/a/2167725
+    let target = e.target
+    let targetTagName = (target.nodeType == 1) ? target.nodeName.toUpperCase() : "";
+    if (!/INPUT|SELECT|TEXTAREA/.test(targetTagName) && e.keyCode == key) {
       f(e)
     }
   }
@@ -51,6 +54,32 @@ function shuffle (arr) {
     arr[randomIndex] = temp
   }
 }
+
+
+// KEYBOARD SHORTCUTS
+function togglePause (video) {
+  if (video.paused) {
+    video.play()
+  } else {
+    video.pause()
+  }
+}
+
+function seekByTimeFn (seconds) {
+  // Returns a function that seeks video by seconds
+  return function (video) {
+    let newTime = Math.min(Math.max(0, video.currentTime + seconds), video.duration)
+    video.currentTime = newTime
+    return newTime
+  }
+}
+
+// These are automatically attached in loadPlaylist
+const SHORTCUTS = Object.freeze({
+  74: seekByTimeFn(-10), // qwerty "j"
+  75: togglePause, // qwerty "k"
+  76: seekByTimeFn(10), // qwerty "l"
+});
 
 // MAIN
 
@@ -119,6 +148,10 @@ function createPlaylist (paths) {
     const video = playVideo(paths[index])
     video.addEventListener('ended', next)
 
+    // Hook keyboard shortcuts
+    for (let [keyCode, fn] of Object.entries(SHORTCUTS)) {
+      document.body.addEventListener('keydown', onKey(keyCode, () => fn(video)));
+    }
     // Keep volume constant for Windows...
     video.onvolumechange = handleVolumeChange
     return true
